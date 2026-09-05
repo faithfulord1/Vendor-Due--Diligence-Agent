@@ -1,7 +1,3 @@
-from fastapi import FastAPI
+from main import app
 
-app = FastAPI()
-
-@app.get("/")
-def home():
-    return {"message": "Vendor Due Diligence Agent is live"}
+__all__ = ["app"]
