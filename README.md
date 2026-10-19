@@ -43,6 +43,7 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 | GET | `/` | project status and purpose |
 | GET | `/health` | health check |
 | POST | `/assess` | deterministic vendor-risk assessment |
+| POST | `/assess/report` | download a Markdown evidence review plan using the same questionnaire |
 
 Example assessment body:
 
@@ -62,6 +63,16 @@ Example assessment body:
 
 The response includes a risk score, tier, stable control findings, evidence requirements, critical blockers and whether human review is required.
 
+For a reviewer handoff, send the same JSON body to `/assess/report` and save
+`vendor-evidence-plan.md` in an approved location. The file includes evidence
+requests, reviewer actions and a pending human decision. It explicitly labels
+questionnaire claims as unverified, including low-risk results. No source
+verification, vendor approval or persistent audit storage is performed by this
+export. Omitted questionnaire flags still use the existing API defaults; confirm
+completeness before relying on the triage output. The endpoint sends `no-store`
+headers, but downloaded files still require your organisation's access and
+retention controls. Use fictional data until production controls are approved.
+
 ## Current deterministic controls
 
 - `TPRM-SAN-001` sanctions / PEP escalation
@@ -79,6 +90,7 @@ The rules are intentionally visible. This makes the project easier to test, expl
 
 ```bash
 python verify.py
+python -m unittest discover -s tests -v
 ```
 
 The verifier checks low-risk, high-risk and sanctions-escalation scenarios. GitHub Actions runs these checks and confirms that the FastAPI application imports correctly on every push and pull request.
