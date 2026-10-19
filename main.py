@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import Literal
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
+from fastapi.responses import Response
+
+from evidence_report import render_evidence_report
 
 app = FastAPI(
     title="TrustSphere Vendor Due Diligence Agent",
@@ -112,3 +115,20 @@ def health():
 @app.post("/assess")
 def assess(payload: VendorAssessment):
     return assess_vendor(payload)
+
+
+@app.post("/assess/report", response_class=Response, responses={
+    200: {"description": "Download an unverified evidence review plan", "content": {
+        "text/markdown": {"schema": {"type": "string"}}
+    }}
+})
+def assess_report(payload: VendorAssessment):
+    return Response(
+        content=render_evidence_report(assess_vendor(payload)),
+        media_type="text/markdown",
+        headers={
+            "Content-Disposition": 'attachment; filename="vendor-evidence-plan.md"',
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
