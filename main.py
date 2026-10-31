@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 from fastapi import FastAPI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from fastapi.responses import Response
 
 from evidence_report import render_evidence_report
@@ -15,6 +15,7 @@ app = FastAPI(
 
 
 class VendorAssessment(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     vendor_name: str = Field(min_length=2)
     critical_vendor: bool = False
     handles_personal_data: bool = False
